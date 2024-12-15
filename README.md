@@ -6,7 +6,7 @@
 
 _Find your GitHub stars easily with natural language search_
 
-**[🚀 Try the Demo](https://luisreinoso.dev/github-starts-rag)**
+**[🚀 Try the Demo](https://luisreinoso.dev/github-starts-semantic-search)**
 
 [Features](#features) • [Installation](#installation) • [Usage](#usage) • [Contributing](#contributing)
 
@@ -27,7 +27,7 @@ GitHub Stars Semantic Search is a powerful tool that transforms how you interact
 
 ## 🚀 Demo
 
-Visit the live demo at [luisreinoso.dev/github-starts-rag](https://luisreinoso.dev/github-starts-rag)
+Visit the live demo at [luisreinoso.dev/github-starts-semantic-search](https://luisreinoso.dev/github-starts-semantic-search)
 
 ## 📋 Prerequisites
 
@@ -40,8 +40,8 @@ Visit the live demo at [luisreinoso.dev/github-starts-rag](https://luisreinoso.d
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/github-stars-rag.git
-cd github-stars-rag
+git clone https://github.com/yourusername/github-stars-semantic-search.git
+cd github-stars-semantic-search
 ```
 
 2. Install dependencies:
