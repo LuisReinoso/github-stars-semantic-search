@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
+  base: '/github-stars-semantic-search/',
   server: {
     port: 3000,
   },
