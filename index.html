@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GitHub Stars Semantic Search</title>
+    <style>
+      .loading {
+        visibility: hidden;
+      }
+      .loaded {
+        visibility: visible;
+      }
+    </style>
+    <script type="module" crossorigin src="/assets/index-BaVW7H-S.js"></script>
+  </head>
+  <body class="bg-secondary-50 min-h-screen loading">
+    <script>
+      // Add loading class to body initially
+      document.body.classList.add('loading');
+      // Remove loading class once styles are applied
+      window.addEventListener('load', () => {
+        document.body.classList.remove('loading');
+        document.body.classList.add('loaded');
+      });
+    </script>
+    <div
+      id="app"
+      class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8"
+    >
+      <header class="text-center mb-8 sm:mb-12">
+        <h1 class="text-3xl sm:text-4xl font-bold text-secondary-900 mb-2">
+          GitHub Stars Semantic Search
+        </h1>
+        <p class="text-sm sm:text-base text-secondary-600">
+          Search through your starred repositories using natural language
+        </p>
+      </header>
+
+      <main class="space-y-6 sm:space-y-8">
+        <section
+          id="auth-section"
+          class="bg-white rounded-xl shadow-sm border border-secondary-200 p-4 sm:p-6"
+        >
+          <h2 class="text-xl sm:text-2xl font-semibold text-secondary-900 mb-4">
+            Authentication
+          </h2>
+          <div class="space-y-4">
+            <div class="flex flex-col">
+              <label
+                for="github-token"
+                class="text-sm font-medium text-secondary-700 mb-1"
+              >
+                GitHub Personal Access Token
+              </label>
+              <div class="relative">
+                <div
+                  class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                >
+                  <svg
+                    class="h-4 w-4 text-secondary-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 2 2 0 012 2 1 1 0 102 0 4 4 0 00-4-4z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <input
+                  type="password"
+                  id="github-token"
+                  placeholder="Enter your GitHub token"
+                  class="w-full pl-10 pr-4 py-2 border border-secondary-300 rounded-lg shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm transition-colors"
+                />
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                  <a
+                    href="https://github.com/settings/tokens"
+                    target="_blank"
+                    class="text-primary-500 hover:text-primary-600 transition-colors"
+                  >
+                    <svg
+                      class="h-4 w-4 shrink-0"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+              <button
+                id="auth-button"
+                class="w-full sm:w-auto px-6 py-2 mt-4 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium flex items-center justify-center gap-2 shadow-sm"
+              >
+                <svg
+                  class="h-4 w-4 shrink-0"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                  />
+                </svg>
+                Authenticate
+              </button>
+              <p class="mt-2 text-sm text-secondary-600">
+                Need a token?
+                <a
+                  href="https://github.com/settings/tokens"
+                  target="_blank"
+                  class="text-primary-500 hover:text-primary-600 hover:underline transition-colors"
+                >
+                  Generate one here
+                </a>
+                . Make sure to include the
+                <span class="font-mono bg-secondary-100 px-1.5 py-0.5 rounded"
+                  >read:user</span
+                >
+                scope.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="indexing-section"
+          class="hidden bg-white rounded-xl shadow-sm border border-secondary-200 p-4 sm:p-6"
+        >
+          <h2 class="text-xl sm:text-2xl font-semibold text-secondary-900 mb-4">
+            Indexing Progress
+          </h2>
+          <div class="space-y-2">
+            <div
+              class="w-full bg-secondary-100 rounded-full h-2.5 overflow-hidden"
+            >
+              <div
+                id="indexing-progress"
+                class="bg-primary-500 h-2.5 rounded-full transition-all duration-300"
+                style="width: 0%"
+              ></div>
+            </div>
+            <div class="space-y-1">
+              <p
+                id="progress-text"
+                class="text-sm font-medium text-secondary-600 text-center"
+              >
+                0% - Initializing...
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="search-section"
+          class="hidden bg-white rounded-xl shadow-sm border border-secondary-200 p-4 sm:p-6"
+        >
+          <h2 class="text-xl sm:text-2xl font-semibold text-secondary-900 mb-4">
+            Search Your Starred Repositories
+          </h2>
+          <div class="space-y-4">
+            <div class="flex flex-col sm:flex-row gap-2">
+              <div class="relative flex-1">
+                <div
+                  class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                >
+                  <svg
+                    class="h-4 w-4 text-secondary-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  id="search-input"
+                  placeholder="Search repositories (e.g., 'React libraries with good documentation')"
+                  class="w-full pl-10 pr-4 py-2 border border-secondary-300 rounded-lg shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm transition-colors"
+                />
+              </div>
+              <div class="flex gap-2 sm:flex-shrink-0">
+                <button
+                  id="search-button"
+                  class="flex-1 sm:flex-none px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors whitespace-nowrap font-medium shadow-sm"
+                >
+                  Search
+                </button>
+                <button
+                  id="reindex-button"
+                  class="flex-1 sm:flex-none px-4 py-2 bg-secondary-100 text-secondary-700 rounded-lg hover:bg-secondary-200 transition-colors whitespace-nowrap font-medium"
+                >
+                  Reindex
+                </button>
+                <button
+                  id="config-button"
+                  class="w-10 sm:w-auto px-2 sm:px-4 py-2 bg-secondary-100 text-secondary-700 rounded-lg hover:bg-secondary-200 transition-colors flex items-center justify-center"
+                  title="Configure batch settings"
+                >
+                  <svg
+                    class="w-4 h-4 shrink-0"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                    ></path>
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    ></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div id="search-results" class="mt-4 sm:mt-6 space-y-4"></div>
+          </div>
+        </section>
+
+        <!-- Configuration Modal -->
+        <div
+          id="config-modal"
+          class="hidden fixed inset-0 bg-secondary-900/50 backdrop-blur-sm flex items-center justify-center z-50"
+        >
+          <div
+            id="config-modal-content"
+            class="bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-lg border border-secondary-200"
+          >
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-xl font-semibold text-secondary-900">
+                Configuration
+              </h3>
+              <button
+                id="close-config-modal"
+                class="text-secondary-500 hover:text-secondary-700 transition-colors"
+              >
+                <svg
+                  class="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+            <div class="space-y-4">
+              <div>
+                <label
+                  for="batch-size"
+                  class="block text-sm font-medium text-secondary-700 mb-1"
+                >
+                  Batch Size
+                </label>
+                <input
+                  type="number"
+                  id="batch-size"
+                  min="1"
+                  max="50"
+                  class="w-full px-3 py-2 border border-secondary-300 rounded-lg shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm transition-colors"
+                />
+                <p class="mt-1 text-sm text-secondary-500">
+                  Number of repositories to process in parallel (1-50)
+                </p>
+              </div>
+              <div>
+                <label
+                  for="max-retries"
+                  class="block text-sm font-medium text-secondary-700 mb-1"
+                >
+                  Max Retries
+                </label>
+                <input
+                  type="number"
+                  id="max-retries"
+                  min="1"
+                  max="10"
+                  class="w-full px-3 py-2 border border-secondary-300 rounded-lg shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm transition-colors"
+                />
+                <p class="mt-1 text-sm text-secondary-500">
+                  Maximum number of retry attempts (1-10)
+                </p>
+              </div>
+              <div>
+                <label
+                  for="per-page"
+                  class="block text-sm font-medium text-secondary-700 mb-1"
+                >
+                  Repositories Per Page
+                </label>
+                <input
+                  type="number"
+                  id="per-page"
+                  min="10"
+                  max="100"
+                  class="w-full px-3 py-2 border border-secondary-300 rounded-lg shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm transition-colors"
+                />
+                <p class="mt-1 text-sm text-secondary-500">
+                  Number of repositories to fetch per page from GitHub (10-100)
+                </p>
+              </div>
+              <div class="flex justify-end mt-6">
+                <button
+                  id="save-config"
+                  class="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium shadow-sm"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
