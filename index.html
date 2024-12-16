@@ -4,31 +4,72 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GitHub Stars Semantic Search</title>
+    <style>
+      /* Base styles */
+      body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        background-color: #f8fafc;
+      }
+      #app {
+        max-width: 64rem;
+        margin: 0 auto;
+        padding: 1rem;
+      }
+      /* Section visibility */
+      .section-container > section {
+        display: none;
+      }
+      /* Only auth section visible by default */
+      #auth-section {
+        display: block;
+      }
+      /* Hidden sections */
+      .hidden {
+        display: none !important;
+      }
+      /* Critical icons styles to prevent flashing */
+      .text-secondary-400 {
+        color: rgb(148 163 184);
+      }
+      .text-primary-500 {
+        color: rgb(14 165 233);
+      }
+      .text-secondary-500 {
+        color: rgb(100 116 139);
+      }
+      .text-secondary-700 {
+        color: rgb(51 65 85);
+      }
+      .h-4 {
+        height: 1rem;
+      }
+      .w-4 {
+        width: 1rem;
+      }
+      .h-6 {
+        height: 1.5rem;
+      }
+      .w-6 {
+        width: 1.5rem;
+      }
+      .shrink-0 {
+        flex-shrink: 0;
+      }
+      /* Prevent layout shift */
+      [data-loading] {
+        visibility: hidden;
+      }
+    </style>
     <script
       defer
       src="https://satisfied-tortoise.pikapod.net/script.js"
       data-website-id="2983c79c-de19-45e8-bb50-18d5ccbf3184"
     ></script>
-    <style>
-      .loading {
-        visibility: hidden;
-      }
-      .loaded {
-        visibility: visible;
-      }
-    </style>
-    <script type="module" crossorigin src="/github-stars-semantic-search/assets/index-BnI5teZF.js"></script>
+    <script type="module" crossorigin src="/github-stars-semantic-search/assets/index-DMUBY6D7.js"></script>
   </head>
-  <body class="bg-secondary-50 min-h-screen loading">
-    <script>
-      // Add loading class to body initially
-      document.body.classList.add('loading');
-      // Remove loading class once styles are applied
-      window.addEventListener('load', () => {
-        document.body.classList.remove('loading');
-        document.body.classList.add('loaded');
-      });
-    </script>
+  <body class="bg-secondary-50 min-h-screen" data-loading>
     <div
       id="app"
       class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8"
@@ -42,7 +83,7 @@
         </p>
       </header>
 
-      <main class="space-y-6 sm:space-y-8">
+      <main class="section-container space-y-6 sm:space-y-8">
         <section
           id="auth-section"
           class="bg-white rounded-xl shadow-sm border border-secondary-200 p-4 sm:p-6"
@@ -247,106 +288,130 @@
             <div id="search-results" class="mt-4 sm:mt-6 space-y-4"></div>
           </div>
         </section>
+      </main>
 
-        <!-- Configuration Modal -->
+      <!-- Configuration Modal - Moved outside main -->
+      <div
+        id="config-modal"
+        class="hidden fixed inset-0 bg-secondary-900/50 backdrop-blur-sm flex items-center justify-center z-50"
+      >
         <div
-          id="config-modal"
-          class="hidden fixed inset-0 bg-secondary-900/50 backdrop-blur-sm flex items-center justify-center z-50"
+          id="config-modal-content"
+          class="bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-lg border border-secondary-200"
         >
-          <div
-            id="config-modal-content"
-            class="bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-lg border border-secondary-200"
-          >
-            <div class="flex justify-between items-center mb-4">
-              <h3 class="text-xl font-semibold text-secondary-900">
-                Configuration
-              </h3>
-              <button
-                id="close-config-modal"
-                class="text-secondary-500 hover:text-secondary-700 transition-colors"
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-semibold text-secondary-900">
+              Configuration
+            </h3>
+            <button
+              id="close-config-modal"
+              class="text-secondary-500 hover:text-secondary-700 transition-colors"
+            >
+              <svg
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                <svg
-                  class="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  ></path>
-                </svg>
-              </button>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
+              </svg>
+            </button>
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label
+                for="batch-size"
+                class="block text-sm font-medium text-secondary-700 mb-1"
+              >
+                Batch Size
+              </label>
+              <input
+                type="number"
+                id="batch-size"
+                min="1"
+                max="50"
+                class="w-full px-3 py-2 border border-secondary-300 rounded-lg shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm transition-colors"
+              />
+              <p class="mt-1 text-sm text-secondary-500">
+                Number of repositories to process in parallel (1-50)
+              </p>
             </div>
-            <div class="space-y-4">
-              <div>
-                <label
-                  for="batch-size"
-                  class="block text-sm font-medium text-secondary-700 mb-1"
-                >
-                  Batch Size
-                </label>
-                <input
-                  type="number"
-                  id="batch-size"
-                  min="1"
-                  max="50"
-                  class="w-full px-3 py-2 border border-secondary-300 rounded-lg shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm transition-colors"
-                />
-                <p class="mt-1 text-sm text-secondary-500">
-                  Number of repositories to process in parallel (1-50)
-                </p>
-              </div>
-              <div>
-                <label
-                  for="max-retries"
-                  class="block text-sm font-medium text-secondary-700 mb-1"
-                >
-                  Max Retries
-                </label>
-                <input
-                  type="number"
-                  id="max-retries"
-                  min="1"
-                  max="10"
-                  class="w-full px-3 py-2 border border-secondary-300 rounded-lg shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm transition-colors"
-                />
-                <p class="mt-1 text-sm text-secondary-500">
-                  Maximum number of retry attempts (1-10)
-                </p>
-              </div>
-              <div>
-                <label
-                  for="per-page"
-                  class="block text-sm font-medium text-secondary-700 mb-1"
-                >
-                  Repositories Per Page
-                </label>
-                <input
-                  type="number"
-                  id="per-page"
-                  min="10"
-                  max="100"
-                  class="w-full px-3 py-2 border border-secondary-300 rounded-lg shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm transition-colors"
-                />
-                <p class="mt-1 text-sm text-secondary-500">
-                  Number of repositories to fetch per page from GitHub (10-100)
-                </p>
-              </div>
-              <div class="flex justify-end mt-6">
-                <button
-                  id="save-config"
-                  class="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium shadow-sm"
-                >
-                  Save Changes
-                </button>
-              </div>
+            <div>
+              <label
+                for="max-retries"
+                class="block text-sm font-medium text-secondary-700 mb-1"
+              >
+                Max Retries
+              </label>
+              <input
+                type="number"
+                id="max-retries"
+                min="1"
+                max="10"
+                class="w-full px-3 py-2 border border-secondary-300 rounded-lg shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm transition-colors"
+              />
+              <p class="mt-1 text-sm text-secondary-500">
+                Maximum number of retry attempts (1-10)
+              </p>
+            </div>
+            <div>
+              <label
+                for="per-page"
+                class="block text-sm font-medium text-secondary-700 mb-1"
+              >
+                Repositories Per Page
+              </label>
+              <input
+                type="number"
+                id="per-page"
+                min="10"
+                max="100"
+                class="w-full px-3 py-2 border border-secondary-300 rounded-lg shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm transition-colors"
+              />
+              <p class="mt-1 text-sm text-secondary-500">
+                Number of repositories to fetch per page from GitHub (1-100)
+              </p>
+            </div>
+            <div class="flex justify-end mt-6">
+              <button
+                id="save-config"
+                class="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium shadow-sm"
+              >
+                Save Changes
+              </button>
             </div>
           </div>
         </div>
-      </main>
+      </div>
+
+      <!-- Footer -->
+      <footer class="mt-8 sm:mt-12 pb-4 sm:pb-6 text-center">
+        <div
+          class="flex items-center justify-center gap-2 text-sm text-secondary-600"
+        >
+          <span>Open Source Project</span>
+          <a
+            href="https://github.com/LuisReinoso/github-stars-semantic-search"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1.5 text-primary-500 hover:text-primary-600 hover:underline transition-colors"
+          >
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                fill-rule="evenodd"
+                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            <span>View on GitHub</span>
+          </a>
+        </div>
+      </footer>
     </div>
   </body>
 </html>
