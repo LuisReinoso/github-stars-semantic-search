@@ -53,10 +53,22 @@ export class UIManager {
 
   public showSection(sectionId: string): void {
     const sections = ['auth-section', 'indexing-section', 'search-section'];
+
+    // First, hide all sections
     sections.forEach((id) => {
       const section = document.getElementById(id);
       if (section) {
-        section.classList.toggle('hidden', id !== sectionId);
+        if (id === sectionId) {
+          console.log(`Making ${id} visible`);
+          section.style.display = 'block';
+          section.classList.remove('hidden');
+        } else {
+          console.log(`Hiding ${id}`);
+          section.style.display = 'none';
+          section.classList.add('hidden');
+        }
+      } else {
+        console.warn(`Section ${id} not found`);
       }
     });
   }
@@ -181,12 +193,14 @@ export class UIManager {
           maxRetriesInput.value = currentConfig.maxRetries.toString();
         if (perPageInput) perPageInput.value = currentConfig.perPage.toString();
         configModal.classList.remove('hidden');
+        configModal.style.display = 'flex';
       });
 
       // Close modal when clicking outside
       configModal.addEventListener('click', (e) => {
         if (e.target === configModal) {
           configModal.classList.add('hidden');
+          configModal.style.display = 'none';
         }
       });
 
@@ -199,6 +213,7 @@ export class UIManager {
     if (closeConfigModal && configModal) {
       closeConfigModal.addEventListener('click', () => {
         configModal.classList.add('hidden');
+        configModal.style.display = 'none';
       });
     }
 
@@ -208,27 +223,28 @@ export class UIManager {
 
         if (batchSizeInput) {
           const batchSize = parseInt(batchSizeInput.value);
-          if (!isNaN(batchSize) && batchSize >= 1 && batchSize <= 50) {
+          if (!isNaN(batchSize)) {
             newConfig.batchSize = batchSize;
           }
         }
 
         if (maxRetriesInput) {
           const maxRetries = parseInt(maxRetriesInput.value);
-          if (!isNaN(maxRetries) && maxRetries >= 1 && maxRetries <= 10) {
+          if (!isNaN(maxRetries)) {
             newConfig.maxRetries = maxRetries;
           }
         }
 
         if (perPageInput) {
           const perPage = parseInt(perPageInput.value);
-          if (!isNaN(perPage) && perPage >= 10 && perPage <= 100) {
+          if (!isNaN(perPage)) {
             newConfig.perPage = perPage;
           }
         }
 
         this.configManager.updateConfig(newConfig);
         configModal.classList.add('hidden');
+        configModal.style.display = 'none';
       });
     }
   }

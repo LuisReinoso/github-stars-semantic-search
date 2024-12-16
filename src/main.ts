@@ -4,12 +4,7 @@ import config from '../twind.config';
 // Initialize Twind immediately
 install(config);
 
-// Wait for styles to be applied before showing content
-document.addEventListener('DOMContentLoaded', () => {
-  // Initialize the rest of the application
-  new App();
-});
-
+// Import dependencies
 import { GitHubService } from './services/github';
 import { OpenAIService } from './services/openai';
 import { DatabaseService } from './services/database';
@@ -18,6 +13,12 @@ import { UIManager } from './services/ui-manager';
 import { RepositoryManager } from './services/repository-manager';
 import { DEFAULT_CONFIG, SearchResult } from './types';
 import { NotificationService } from './services/notification';
+
+// Wait for DOM content to be loaded
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('DOM Content Loaded - initializing app');
+  new App();
+});
 
 class App {
   private configManager: ConfigManager;
@@ -130,9 +131,15 @@ class App {
       );
     } catch (error) {
       console.error('Authentication error:', error);
+      // Log detailed error information
+      if (error instanceof Error) {
+        console.error('Error name:', error.name);
+        console.error('Error message:', error.message);
+        console.error('Error stack:', error.stack);
+      }
       this.notificationService.show(
         'error',
-        'An error occurred during authentication'
+        'An error occurred during authentication. Check console for details.'
       );
     }
   }

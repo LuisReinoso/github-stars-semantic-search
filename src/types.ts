@@ -30,5 +30,5 @@ export interface AppConfig {
 export const DEFAULT_CONFIG: AppConfig = {
   batchSize: 5,
   maxRetries: 5,
-  perPage: 30,
+  perPage: 5,
 };
