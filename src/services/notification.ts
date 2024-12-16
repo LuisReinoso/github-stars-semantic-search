@@ -294,7 +294,7 @@ export class NotificationService {
 
   public async prompt(
     message: string,
-    placeholder = ''
+    placeholder: string
   ): Promise<string | null> {
     return new Promise((resolve) => {
       if (!this.modalContainer) return resolve(null);
@@ -302,59 +302,66 @@ export class NotificationService {
       this.modalContainer.className =
         'fixed inset-0 z-50 flex items-center justify-center';
       this.modalContainer.innerHTML = `
-        <div class="fixed inset-0 bg-black bg-opacity-25 transition-opacity"></div>
-        <div class="relative bg-white rounded-lg max-w-md w-full mx-4 overflow-hidden shadow-xl transform transition-all">
-          <div class="bg-white px-4 pt-5 pb-4 sm:p-6">
-            <div class="sm:flex sm:items-start">
-              <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
-                <svg class="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-              </div>
-              <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                <h3 class="text-lg leading-6 font-medium text-gray-900">Input Required</h3>
-                <div class="mt-2">
-                  <p class="text-sm text-gray-500 mb-4">${message}</p>
-                  <input type="text" class="prompt-input shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="${placeholder}">
+        <div class="fixed inset-0 bg-secondary-900/50 backdrop-blur-sm transition-opacity"></div>
+        <div class="relative bg-white rounded-xl max-w-md w-full mx-4 overflow-hidden shadow-lg border border-secondary-200">
+          <div class="bg-white px-6 py-6">
+            <div class="space-y-4">
+              <div class="flex items-start">
+                <div class="flex-shrink-0">
+                  <svg class="h-6 w-6 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div class="ml-3 flex-1">
+                  <h3 class="text-lg font-medium text-secondary-900">API Key Required</h3>
+                  <p class="mt-1.5 text-sm text-secondary-600">${message}</p>
+                  <div class="mt-4">
+                    <input
+                      type="password"
+                      id="prompt-input"
+                      placeholder="${placeholder}"
+                      class="w-full px-3 py-2 border border-secondary-300 rounded-lg shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm transition-colors"
+                    />
+                  </div>
                 </div>
               </div>
+              <div class="flex justify-end gap-3">
+                <button
+                  type="button"
+                  class="px-4 py-2 bg-secondary-100 text-secondary-700 rounded-lg hover:bg-secondary-200 transition-colors font-medium"
+                  id="prompt-cancel"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  class="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium shadow-sm"
+                  id="prompt-confirm"
+                >
+                  Confirm
+                </button>
+              </div>
             </div>
-          </div>
-          <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse gap-2">
-            <button type="button" class="prompt-submit w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-              Submit
-            </button>
-            <button type="button" class="prompt-cancel mt-3 sm:mt-0 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary sm:w-auto sm:text-sm">
-              Cancel
-            </button>
           </div>
         </div>
       `;
 
       const input = this.modalContainer.querySelector(
-        '.prompt-input'
+        '#prompt-input'
       ) as HTMLInputElement;
-      const submitButton = this.modalContainer.querySelector('.prompt-submit');
-      const cancelButton = this.modalContainer.querySelector('.prompt-cancel');
-      const backdrop = this.modalContainer.querySelector(
-        '.fixed.inset-0.bg-black'
-      );
+      const confirmButton =
+        this.modalContainer.querySelector('#prompt-confirm');
+      const cancelButton = this.modalContainer.querySelector('#prompt-cancel');
 
       const cleanup = () => {
         this.modalContainer!.className = 'fixed inset-0 z-50 hidden';
         this.modalContainer!.innerHTML = '';
       };
 
-      input?.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          cleanup();
-          resolve(input.value);
-        }
-      });
-
-      submitButton?.addEventListener('click', () => {
+      confirmButton?.addEventListener('click', () => {
+        const value = input?.value || null;
         cleanup();
-        resolve(input?.value || null);
+        resolve(value);
       });
 
       cancelButton?.addEventListener('click', () => {
@@ -362,13 +369,17 @@ export class NotificationService {
         resolve(null);
       });
 
-      backdrop?.addEventListener('click', () => {
-        cleanup();
-        resolve(null);
-      });
+      // Focus input
+      setTimeout(() => input?.focus(), 100);
 
-      // Focus the input
-      input?.focus();
+      // Handle Enter key
+      input?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          const value = input.value || null;
+          cleanup();
+          resolve(value);
+        }
+      });
     });
   }
 }
