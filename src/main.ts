@@ -1,8 +1,11 @@
 import { install } from '@twind/core';
 import config from '../twind.config';
 
-// Initialize Twind immediately
+// Initialize Twind immediately before any content is rendered
 install(config);
+
+// Remove loading state as soon as Twind is initialized
+document.body.removeAttribute('data-loading');
 
 // Import dependencies
 import { GitHubService } from './services/github';
