@@ -283,7 +283,7 @@ export class UIManager {
       if (button) {
         button.addEventListener('click', () => {
           const config = this.configManager.getConfig();
-          const nextPage = Math.floor(currentCount / config.perPage) + 1;
+          const nextPage = Math.ceil(currentCount / config.perPage) + 1;
           this.showSection('indexing-section');
           onFetchMore(nextPage);
         });
