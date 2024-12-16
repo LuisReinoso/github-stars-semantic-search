@@ -62,6 +62,8 @@ export class GitHubService {
       await this.octokit.activity.listReposStarredByAuthenticatedUser({
         per_page: perPage,
         page: page,
+        sort: 'created',
+        direction: 'asc',
       });
 
     const total = response.data.length;
