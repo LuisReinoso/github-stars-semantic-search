@@ -67,7 +67,7 @@
       src="https://satisfied-tortoise.pikapod.net/script.js"
       data-website-id="2983c79c-de19-45e8-bb50-18d5ccbf3184"
     ></script>
-    <script type="module" crossorigin src="/github-stars-semantic-search/assets/index-CC_-uQ9E.js"></script>
+    <script type="module" crossorigin src="/github-stars-semantic-search/assets/index-CuUTCYn2.js"></script>
   </head>
   <body class="bg-secondary-50 min-h-screen" data-loading>
     <div
@@ -145,27 +145,11 @@
                   </a>
                 </div>
               </div>
-              <button
-                id="auth-button"
-                class="w-full sm:w-auto px-6 py-2 mt-4 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium flex items-center justify-center gap-2 shadow-sm"
-              >
-                <svg
-                  class="h-4 w-4 shrink-0"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
-                  />
-                </svg>
-                Authenticate
-              </button>
-              <p class="mt-2 text-sm text-secondary-600">
+              <div
+                id="github-token-error"
+                class="text-sm text-red-600 mt-1"
+              ></div>
+              <p class="mt-1 text-sm text-secondary-500">
                 Need a token?
                 <a
                   href="https://github.com/settings/tokens"
@@ -181,6 +165,120 @@
                 scope.
               </p>
             </div>
+
+            <div class="flex flex-col mt-4">
+              <label
+                for="openai-key"
+                class="text-sm font-medium text-secondary-700 mb-1"
+              >
+                OpenAI API Key
+              </label>
+              <div class="relative">
+                <div
+                  class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+                >
+                  <svg
+                    class="h-4 w-4 text-secondary-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 2 2 0 012 2 1 1 0 102 0 4 4 0 00-4-4z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <input
+                  type="password"
+                  id="openai-key"
+                  placeholder="Enter your OpenAI API key"
+                  class="w-full pl-10 pr-4 py-2 border border-secondary-300 rounded-lg shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm transition-colors"
+                />
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+                  <a
+                    href="https://platform.openai.com/api-keys"
+                    target="_blank"
+                    class="text-primary-500 hover:text-primary-600 transition-colors"
+                  >
+                    <svg
+                      class="h-4 w-4 shrink-0"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+              <div
+                id="openai-key-error"
+                class="text-sm text-red-600 mt-1"
+              ></div>
+              <p class="mt-1 text-sm text-secondary-500">
+                Need an API key?
+                <a
+                  href="https://platform.openai.com/api-keys"
+                  target="_blank"
+                  class="text-primary-500 hover:text-primary-600 hover:underline transition-colors"
+                >
+                  Get one here
+                </a>
+              </p>
+            </div>
+
+            <div class="flex flex-col mt-4">
+              <label
+                for="auth-per-page"
+                class="text-sm font-medium text-secondary-700 mb-1"
+              >
+                Repositories Per Page
+              </label>
+              <div class="relative">
+                <input
+                  type="number"
+                  id="auth-per-page"
+                  min="1"
+                  max="100"
+                  placeholder="Enter number (1-100)"
+                  class="w-full px-3 py-2 border border-secondary-300 rounded-lg shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm transition-colors"
+                />
+              </div>
+              <div id="per-page-error" class="text-sm text-red-600 mt-1"></div>
+              <p class="mt-1 text-sm text-amber-600">
+                <strong>Important:</strong> This setting cannot be changed after
+                initial setup due to GitHub pagination (1-100) requirements.
+              </p>
+            </div>
+
+            <button
+              id="auth-button"
+              class="w-full sm:w-auto px-6 py-2 mt-6 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium flex items-center justify-center gap-2 shadow-sm"
+            >
+              <svg
+                class="h-4 w-4 shrink-0"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                />
+              </svg>
+              Authenticate
+            </button>
           </div>
         </section>
 
@@ -357,24 +455,6 @@
               />
               <p class="mt-1 text-sm text-secondary-500">
                 Maximum number of retry attempts (1-10)
-              </p>
-            </div>
-            <div>
-              <label
-                for="per-page"
-                class="block text-sm font-medium text-secondary-700 mb-1"
-              >
-                Repositories Per Page
-              </label>
-              <input
-                type="number"
-                id="per-page"
-                min="10"
-                max="100"
-                class="w-full px-3 py-2 border border-secondary-300 rounded-lg shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm transition-colors"
-              />
-              <p class="mt-1 text-sm text-secondary-500">
-                Number of repositories to fetch per page from GitHub (1-100)
               </p>
             </div>
             <div class="flex justify-end mt-6">
