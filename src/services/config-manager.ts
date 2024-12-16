@@ -12,7 +12,7 @@ export class ConfigManager {
     config: Partial<AppConfig>,
     currentConfig: AppConfig
   ): AppConfig {
-    const validated: AppConfig = { ...currentConfig };
+    const validated: AppConfig = { ...currentConfig, ...config };
 
     if (typeof config.batchSize === 'number' && !isNaN(config.batchSize)) {
       validated.batchSize = Math.min(Math.max(config.batchSize, 1), 50);
@@ -20,10 +20,6 @@ export class ConfigManager {
 
     if (typeof config.maxRetries === 'number' && !isNaN(config.maxRetries)) {
       validated.maxRetries = Math.min(Math.max(config.maxRetries, 1), 10);
-    }
-
-    if (typeof config.perPage === 'number' && !isNaN(config.perPage)) {
-      validated.perPage = Math.min(Math.max(config.perPage, 1), 100);
     }
 
     return validated;

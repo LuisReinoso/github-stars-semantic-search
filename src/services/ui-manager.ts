@@ -179,9 +179,6 @@ export class UIManager {
     const maxRetriesInput = document.getElementById(
       'max-retries'
     ) as HTMLInputElement;
-    const perPageInput = document.getElementById(
-      'per-page'
-    ) as HTMLInputElement;
 
     if (configButton && configModal && configModalContent) {
       // Open modal
@@ -191,7 +188,6 @@ export class UIManager {
           batchSizeInput.value = currentConfig.batchSize.toString();
         if (maxRetriesInput)
           maxRetriesInput.value = currentConfig.maxRetries.toString();
-        if (perPageInput) perPageInput.value = currentConfig.perPage.toString();
         configModal.classList.remove('hidden');
         configModal.style.display = 'flex';
       });
@@ -204,7 +200,6 @@ export class UIManager {
         }
       });
 
-      // Prevent clicks inside modal from closing it
       configModalContent.addEventListener('click', (e) => {
         e.stopPropagation();
       });
@@ -232,13 +227,6 @@ export class UIManager {
           const maxRetries = parseInt(maxRetriesInput.value);
           if (!isNaN(maxRetries)) {
             newConfig.maxRetries = maxRetries;
-          }
-        }
-
-        if (perPageInput) {
-          const perPage = parseInt(perPageInput.value);
-          if (!isNaN(perPage)) {
-            newConfig.perPage = perPage;
           }
         }
 

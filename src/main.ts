@@ -45,6 +45,14 @@ class App {
     const searchInput = document.getElementById(
       'search-input'
     ) as HTMLInputElement;
+    const perPageInput = document.getElementById(
+      'auth-per-page'
+    ) as HTMLInputElement;
+
+    if (perPageInput) {
+      const config = this.configManager.getConfig();
+      perPageInput.value = config.perPage.toString();
+    }
 
     authButton?.addEventListener('click', () => this.handleAuthentication());
     searchButton?.addEventListener('click', () => this.handleSearch());
@@ -65,9 +73,15 @@ class App {
     const tokenInput = document.getElementById(
       'github-token'
     ) as HTMLInputElement;
+    const openaiInput = document.getElementById(
+      'openai-key'
+    ) as HTMLInputElement;
 
     if (githubToken) {
       tokenInput.value = githubToken;
+    }
+    if (openaiKey) {
+      openaiInput.value = openaiKey;
     }
 
     if (githubToken && openaiKey) {
@@ -79,20 +93,69 @@ class App {
     const tokenInput = document.getElementById(
       'github-token'
     ) as HTMLInputElement;
+    const openaiInput = document.getElementById(
+      'openai-key'
+    ) as HTMLInputElement;
+    const perPageInput = document.getElementById(
+      'auth-per-page'
+    ) as HTMLInputElement;
+    const githubTokenError = document.getElementById('github-token-error');
+    const openaiKeyError = document.getElementById('openai-key-error');
+    const perPageError = document.getElementById('per-page-error');
+
+    // Clear previous error messages
+    if (githubTokenError) {
+      githubTokenError.textContent = '';
+      tokenInput.classList.remove('border-red-500');
+    }
+    if (openaiKeyError) {
+      openaiKeyError.textContent = '';
+      openaiInput.classList.remove('border-red-500');
+    }
+    if (perPageError) {
+      perPageError.textContent = '';
+      perPageInput.classList.remove('border-red-500');
+    }
+
     const token = tokenInput.value.trim();
-    const storedOpenaiKey = localStorage.getItem('openaiKey');
+    const openaiKey = openaiInput.value.trim();
+    const perPage = parseInt(perPageInput.value);
 
-    const openaiKey =
-      storedOpenaiKey ||
-      (await this.notificationService.prompt(
-        'Please enter your OpenAI API key',
-        'sk-...'
-      ));
+    const showError = (
+      element: HTMLElement | null,
+      input: HTMLInputElement,
+      message: string
+    ) => {
+      if (element) {
+        element.textContent = message;
+        input.classList.add('border-red-500');
+      }
+    };
 
-    if (!token || !openaiKey) {
-      this.notificationService.show(
-        'error',
-        'Both GitHub token and OpenAI API key are required'
+    if (!token) {
+      showError(githubTokenError, tokenInput, 'GitHub token is required');
+      return;
+    }
+
+    if (!openaiKey) {
+      showError(openaiKeyError, openaiInput, 'OpenAI API key is required');
+      return;
+    }
+
+    if (!perPageInput.value.trim()) {
+      showError(
+        perPageError,
+        perPageInput,
+        'Repositories per page is required'
+      );
+      return;
+    }
+
+    if (!perPage || isNaN(perPage) || perPage < 1 || perPage > 100) {
+      showError(
+        perPageError,
+        perPageInput,
+        'Please enter a number between 1 and 100'
       );
       return;
     }
@@ -104,7 +167,15 @@ class App {
       const isValid = await githubService.validateToken();
 
       if (!isValid) {
-        this.notificationService.show('error', 'Invalid GitHub token');
+        showError(githubTokenError, tokenInput, 'Invalid GitHub token');
+        return;
+      }
+
+      try {
+        const openaiService = new OpenAIService(openaiKey);
+        await openaiService.generateSearchEmbedding('test');
+      } catch (error) {
+        showError(openaiKeyError, openaiInput, 'Invalid OpenAI API key');
         return;
       }
 
@@ -113,6 +184,9 @@ class App {
       localStorage.setItem('openaiKey', openaiKey);
 
       const openaiService = new OpenAIService(openaiKey);
+
+      // Set perPage in config
+      this.configManager.updateConfig({ perPage });
 
       // Initialize repository manager
       this.repositoryManager = new RepositoryManager(
@@ -128,10 +202,7 @@ class App {
 
       this.uiManager.showSection('indexing-section');
       await this.repositoryManager.indexRepositories();
-      this.notificationService.show(
-        'success',
-        'Successfully authenticated and initialized'
-      );
+      this.notificationService.show('success', 'Successfully authenticated');
     } catch (error) {
       console.error('Authentication error:', error);
       // Log detailed error information
@@ -192,17 +263,62 @@ class App {
       return;
     }
 
-    const shouldReindex = await this.notificationService.confirm(
-      'Are you sure you want to reindex all repositories? This will delete all existing data.'
-    );
+    const currentConfig = this.configManager.getConfig();
+    const { confirmed, perPage } =
+      await this.notificationService.confirmWithPerPage(currentConfig.perPage);
 
-    if (!shouldReindex) {
+    if (!confirmed) {
+      return;
+    }
+
+    // Ensure we have a valid perPage value
+    if (!perPage || perPage < 1 || perPage > 100) {
+      this.notificationService.show(
+        'error',
+        'Please enter a valid number between 1 and 100'
+      );
       return;
     }
 
     try {
+      this.configManager.updateConfig({ perPage });
+
+      const perPageInput = document.getElementById(
+        'auth-per-page'
+      ) as HTMLInputElement;
+      if (perPageInput) {
+        perPageInput.value = perPage.toString();
+      }
+
+      // Clear the database and start fresh
+      const databaseService = new DatabaseService();
+      await databaseService.initialize();
+      await databaseService.query('DELETE FROM embeddings');
+      await databaseService.query('DELETE FROM repositories');
+
+      // Re-create repository manager with new configuration
+      const githubToken = localStorage.getItem('githubToken');
+      const openaiKey = localStorage.getItem('openaiKey');
+
+      if (!githubToken || !openaiKey) {
+        throw new Error('Authentication tokens not found');
+      }
+
+      const githubService = new GitHubService(githubToken);
+      const openaiService = new OpenAIService(openaiKey);
+
+      this.repositoryManager = new RepositoryManager(
+        githubService,
+        openaiService,
+        databaseService,
+        this.configManager,
+        this.uiManager
+      );
+
+      await this.repositoryManager.initialize();
       this.notificationService.show('info', 'Starting reindexing process...');
-      await this.repositoryManager.reindex();
+      this.uiManager.showSection('indexing-section');
+      await this.repositoryManager.indexRepositories();
       this.notificationService.show(
         'success',
         'Successfully reindexed all repositories'

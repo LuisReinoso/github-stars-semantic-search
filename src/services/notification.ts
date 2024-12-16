@@ -28,13 +28,13 @@ export class NotificationService {
   private createContainer() {
     this.container = document.createElement('div');
     this.container.className =
-      'fixed bottom-4 right-4 z-50 flex flex-col gap-3 min-w-[320px] max-w-[420px]';
+      'fixed bottom-4 right-4 z-[9999] flex flex-col gap-3 min-w-[320px] max-w-[420px]';
     document.body.appendChild(this.container);
   }
 
   private createModalContainer() {
     this.modalContainer = document.createElement('div');
-    this.modalContainer.className = 'fixed inset-0 z-50 hidden';
+    this.modalContainer.className = 'fixed inset-0 z-[1000] hidden';
     document.body.appendChild(this.modalContainer);
   }
 
@@ -234,7 +234,7 @@ export class NotificationService {
       if (!this.modalContainer) return resolve(false);
 
       this.modalContainer.className =
-        'fixed inset-0 z-50 flex items-center justify-center';
+        'fixed inset-0 z-[1000] flex items-center justify-center';
       this.modalContainer.innerHTML = `
         <div class="fixed inset-0 bg-black bg-opacity-25 transition-opacity"></div>
         <div class="relative bg-white rounded-lg max-w-md w-full mx-4 overflow-hidden shadow-xl transform transition-all">
@@ -271,7 +271,7 @@ export class NotificationService {
       );
 
       const cleanup = () => {
-        this.modalContainer!.className = 'fixed inset-0 z-50 hidden';
+        this.modalContainer!.className = 'fixed inset-0 z-[1000] hidden';
         this.modalContainer!.innerHTML = '';
       };
 
@@ -300,10 +300,10 @@ export class NotificationService {
       if (!this.modalContainer) return resolve(null);
 
       this.modalContainer.className =
-        'fixed inset-0 z-50 flex items-center justify-center';
+        'fixed inset-0 z-[1000] flex items-center justify-center';
       this.modalContainer.innerHTML = `
-        <div class="fixed inset-0 bg-secondary-900/50 backdrop-blur-sm transition-opacity"></div>
-        <div class="relative bg-white rounded-xl max-w-md w-full mx-4 overflow-hidden shadow-lg border border-secondary-200">
+        <div class="fixed inset-0 bg-secondary-900/50 backdrop-blur-sm transition-opacity z-[1001]"></div>
+        <div class="relative bg-white rounded-xl max-w-md w-full mx-4 overflow-hidden shadow-lg border border-secondary-200 z-[1002]">
           <div class="bg-white px-6 py-6">
             <div class="space-y-4">
               <div class="flex items-start">
@@ -354,7 +354,7 @@ export class NotificationService {
       const cancelButton = this.modalContainer.querySelector('#prompt-cancel');
 
       const cleanup = () => {
-        this.modalContainer!.className = 'fixed inset-0 z-50 hidden';
+        this.modalContainer!.className = 'fixed inset-0 z-[1000] hidden';
         this.modalContainer!.innerHTML = '';
       };
 
@@ -379,6 +379,101 @@ export class NotificationService {
           cleanup();
           resolve(value);
         }
+      });
+    });
+  }
+
+  public async confirmWithPerPage(
+    currentPerPage: number
+  ): Promise<{ confirmed: boolean; perPage: number | null }> {
+    return new Promise((resolve) => {
+      if (!this.modalContainer)
+        return resolve({ confirmed: false, perPage: null });
+
+      this.modalContainer.className =
+        'fixed inset-0 z-[1000] flex items-center justify-center';
+      this.modalContainer.innerHTML = `
+        <div class="fixed inset-0 bg-secondary-900/50 backdrop-blur-sm transition-opacity z-[1001]"></div>
+        <div class="relative bg-white rounded-xl max-w-md w-full mx-4 overflow-hidden shadow-lg border border-secondary-200 z-[1002]">
+          <div class="bg-white px-6 py-6">
+            <div class="space-y-4">
+              <div class="flex items-start">
+                <div class="flex-shrink-0">
+                  <svg class="h-6 w-6 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                </div>
+                <div class="ml-3 flex-1">
+                  <h3 class="text-lg font-medium text-secondary-900">Confirmation Required</h3>
+                  <div class="mt-3 space-y-4">
+                    <div>
+                      <label for="per-page" class="block text-sm font-medium text-secondary-700">
+                        Repositories Per Page
+                      </label>
+                      <div class="mt-1">
+                        <input
+                          type="number"
+                          id="per-page"
+                          min="1"
+                          max="100"
+                          value="${currentPerPage}"
+                          class="w-full px-3 py-2 border border-secondary-300 rounded-lg shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm transition-colors"
+                        />
+                      </div>
+                      <p class="mt-1 text-sm text-amber-600">
+                        <strong>Note:</strong> This setting affects GitHub API pagination (1-100). Choose carefully as it impacts how repositories are fetched.
+                      </p>
+                    </div>
+                    <p class="text-sm text-secondary-600">
+                      Are you sure you want to reindex all repositories? This will delete all existing data.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-5 flex justify-end gap-3">
+                <button
+                  id="cancel-button"
+                  class="px-4 py-2 text-sm font-medium text-secondary-700 hover:text-secondary-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                >
+                  Cancel
+                </button>
+                <button
+                  id="confirm-button"
+                  class="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium shadow-sm"
+                >
+                  Yes, continue
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const cancelButton = this.modalContainer.querySelector('#cancel-button');
+      const confirmButton =
+        this.modalContainer.querySelector('#confirm-button');
+      const perPageInput = this.modalContainer.querySelector(
+        '#per-page'
+      ) as HTMLInputElement;
+
+      const cleanup = () => {
+        this.modalContainer!.className = 'fixed inset-0 z-[1000] hidden';
+        this.modalContainer!.innerHTML = '';
+      };
+
+      cancelButton?.addEventListener('click', () => {
+        cleanup();
+        resolve({ confirmed: false, perPage: null });
+      });
+
+      confirmButton?.addEventListener('click', () => {
+        const perPage = parseInt(perPageInput.value);
+        if (isNaN(perPage) || perPage < 1 || perPage > 100) {
+          this.show('error', 'Please enter a valid number between 1 and 100');
+          return;
+        }
+        cleanup();
+        resolve({ confirmed: true, perPage });
       });
     });
   }
