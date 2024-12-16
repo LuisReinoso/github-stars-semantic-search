@@ -34,6 +34,12 @@ export class RepositoryManager {
     const totalStars = await this.githubService.getTotalStarredCount();
     this.uiManager.setTotalStars(totalStars);
 
+    const config = this.configManager.getConfig();
+    this.configManager.updateConfig({
+      ...config,
+      perPage: config.perPage || 5, // Set default if not initialized
+    });
+
     const { rows } = (await this.databaseService.query(
       'SELECT COUNT(*) as count FROM repositories'
     )) as QueryResult;
